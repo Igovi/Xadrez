@@ -59,8 +59,7 @@ class Game:
             board.desenhar_tabuleiro(self.pygame, self.janela)
             board.desenhar_pecas(self.pygame, self.janela)
             self.pygame.display.flip()
-            
-        
+             
     def desenhar_botoes_de_pecas(self, color):
         BUTTON_WIDTH = BUTTON_HEIGHT = 96
         BUTTON_PADDING = 24
@@ -91,7 +90,41 @@ class Game:
             
         self.BOTOES = promotion_buttons
         self.pygame.display.flip()
+    
+    def desenhar_botoes_de_inicio(self):
+        BUTTON_WIDTH = BUTTON_HEIGHT = 96
+        BUTTON_PADDING = 24
+
+        # Calcula a posição horizontal central dos botões
+        total_width = 2 * (BUTTON_WIDTH + BUTTON_PADDING)
+        start_x = self.SCREEN_WIDTH // 2 - total_width // 2
+
+        # Calcula a posição vertical dos botões para estar abaixo do texto
+        text_height = 45  # A altura do texto que você usou em 'end_game'
+        start_y = self.SCREEN_HEIGHT // 2 + text_height + BUTTON_PADDING  # Adicione o espaço adicional que você deseja abaixo do texto
         
+        # Mensagem de Inicio
+        screen = self.pygame.display.get_surface()
+        font = self.pygame.font.Font(None, 128)
+        text = font.render('Xadrez 2.0', True, (30,144,255))
+        text_rect = text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+        screen.blit(text, text_rect)
+
+        buttons = [
+            {'rect': pygame.Rect(start_x, start_y, BUTTON_WIDTH, BUTTON_HEIGHT), 'text': 'Fácil', 'dificuldade': 1},
+            {'rect': pygame.Rect(start_x + BUTTON_WIDTH + BUTTON_PADDING, start_y, BUTTON_WIDTH, BUTTON_HEIGHT), 'text': 'Moderado', 'dificuldade': 2},
+        ]
+
+        for button in buttons:
+            pygame.draw.circle(self.janela, (192, 192, 192), button['rect'].center, button['rect'].width // 2)
+            font = pygame.font.Font(None, 24)  # Escolha o tamanho e a fonte do texto
+            text = font.render(button['text'], True, (0, 0, 0))  # Crie uma superfície de texto com o texto desejado e a cor preta
+            text_rect = text.get_rect(center=button['rect'].center)  # Posicione o texto no centro do botão
+            self.janela.blit(text, text_rect)
+
+        self.BOTOES = buttons
+        self.pygame.display.update()
+      
     def desenhar_botoes_de_fim(self):
         BUTTON_WIDTH = BUTTON_HEIGHT = 96
         BUTTON_PADDING = 24
@@ -119,7 +152,6 @@ class Game:
         self.BOTOES = end_buttons
         self.pygame.display.flip()
 
-    
     # Descobre qual botão foi clicado e retorna o nome da peça
     def peca_selecionada(self, pos):
         if self.BOTOES:

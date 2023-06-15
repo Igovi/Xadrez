@@ -46,12 +46,38 @@ def main():
     selected_piece_clone = None
     original_position = None
     peca_imagem = None
+    menu_inicial = True
+    dificuldade = 1.0
+    mouse_button_down = False  # Evita que caia no click up do mouse em events
+    empate = False
     
+    game.desenhar_botoes_de_inicio()
+    while menu_inicial:    
+        for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        os._exit(0)
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        btn = game.peca_selecionada(event.pos)
+                        if btn is not None and btn['dificuldade'] > 0:
+                            if btn['dificuldade'] == 1:
+                                engine.configure({"Skill Level": 0})
+                            elif btn['dificuldade'] == 2:
+                                engine.configure({"Skill Level": 10})
+                            elif btn['dificuldade'] == 3:
+                                engine.configure({"Skill Level": 20})   
+                            menu_inicial = False
+    
+    game.desenha_tela(BOARD)
     while running:
         dt = clock.tick(60)  # Limita o loop a no máximo 60 frames por segundo
         tempo_de_jogo += dt / 1000.0
         if BOARD.tabuleiro_lib.is_checkmate():
             fim_partida = True
+        
+        if BOARD.tabuleiro_lib.is_stalemate():
+            fim_partida = True
+            empate = True
             
         if BOARD.PROMOVER[0] and not pause_render_tabuleiro:
                 pause_render_tabuleiro = True
@@ -64,7 +90,7 @@ def main():
                         pygame.quit()
                         os._exit(0)
                     elif event.type == pygame.MOUSEBUTTONDOWN:
-                        # ... o código anterior ...
+                        mouse_button_down = True
                         if not BOARD.PROMOVER[0] and not fim_partida:
                             # Jogadas
                             mouse_pos = pygame.mouse.get_pos()
@@ -94,7 +120,7 @@ def main():
                             peca_rect.center = (event.pos[0], event.pos[1])
                             game.janela.blit(peca_imagem, peca_rect)
                             pygame.display.update()
-                    elif event.type == pygame.MOUSEBUTTONUP:
+                    elif event.type == pygame.MOUSEBUTTONUP and mouse_button_down:
                         row = int(event.pos[1] // BOARD.TAMANHO_QUADRADO)
                         col = int(event.pos[0] // BOARD.TAMANHO_QUADRADO)
                         movimentos = BOARD.movimentos
